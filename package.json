@@ -1,0 +1,11 @@
+{
+  "name": "unity-obj-exporter",
+  "version": "0.1.0",
+  "description": "Export .unity3d to .obj",
+  "main": "index.js",
+  "author": "Snack <korsnack@korsnack.kr>",
+  "license": "MIT",
+  "dependencies": {
+    "UnityBundle.js": "Snack-X/UnityBundle.js"
+  }
+}
