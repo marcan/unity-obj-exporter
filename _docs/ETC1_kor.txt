@@ -1,0 +1,101 @@
+4x4 RGB 블록 -> 64bit (litten endian)
+
+33번째 bit(= diffbit)가 0일 경우 'individual' 모드, 1일 경우 'differential' 모드
+
+    bits 63 ~ 32 (if diffbit = 0)
+
+     63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48
+     -----------------------------------------------
+    | base col1 | base col2 | base col1 | base col2 |
+    | R1 (4bits)| R2 (4bits)| G1 (4bits)| G2 (4bits)|
+     -----------------------------------------------
+
+     47 46 45 44 43 42 41 40 39 38 37 36 35 34  33  32
+     ---------------------------------------------------
+    | base col1 | base col2 | table  | table  |diff|flip|
+    | B1 (4bits)| B2 (4bits)| cw 1   | cw 2   |bit |bit |
+     ---------------------------------------------------
+
+
+    bit 63 ~ 32 (if diffbit = 1)
+
+     63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48
+     -----------------------------------------------
+    | base col1    | dcol 2 | base col1    | dcol 2 |
+    | R1' (5 bits) | dR2    | G1' (5 bits) | dG2    |
+     -----------------------------------------------
+
+     47 46 45 44 43 42 41 40 39 38 37 36 35 34  33  32
+     ---------------------------------------------------
+    | base col 1   | dcol 2 | table  | table  |diff|flip|
+    | B1' (5 bits) | dB2    | cw 1   | cw 2   |bit |bit |
+     ---------------------------------------------------
+
+
+    bit 31 ~ 0
+
+     31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16
+     -----------------------------------------------
+    |       most significant pixel index bits       |
+    | p| o| n| m| l| k| j| i| h| g| f| e| d| c| b| a|
+     -----------------------------------------------
+
+     15 14 13 12 11 10  9  8  7  6  5  4  3   2   1  0
+     --------------------------------------------------
+    |         least significant pixel index bits       |
+    | p| o| n| m| l| k| j| i| h| g| f| e| d| c | b | a |
+     --------------------------------------------------
+
+32번째 bit(= flipbit)가 0일 경우 4x4 블록은 2x4 서브블록으로 나뉘어 좌우로 배치, 1일 경우 4x2 서브블록으로 나뉘어 상하로 배치됨
+
+      subbl-  subbl-
+      ock 1   ock 2
+     --- --- --- ---
+    | a   e | i   m |
+    | b   f | j   n |
+    | c   g | k   o |
+    | d   h | l   p |
+     --- --- --- ---
+
+     --- --- --- ---
+    | a   e   i   m | subblock 1
+    | b   f   j   n |
+     ---------------
+    | c   g   k   o | subblock 2
+    | d   h   l   p |
+     --- --- --- ---
+
+각 서브블록의 base color가 저장됨
+
+individual 모드에선 subblock 1의 base color는 R1, G1, B1에 저장됨
+R1, G1, B1은 4비트이기 때문에 8비트로 만들 때 남은 공간에 4비트를 그대로 넣음 (0b1100 -> 0b11001100)
+subblock 2의 base color는 R2, G2, B2를 이용해 똑같이 저장됨
+
+differential 모드에선 subblock 1의 base color는 R1', G1', B1'에 저장됨
+R1', G1', B1'은 5비트이기 때문에 8비트로 만들 때 남은 3비트에 5비트의 상위 3비트를 그대로 넣음 (0b11100 -> 0b11100111)
+subblock 2의 base color는 R1', G1', B1'에 dR2, dG2, dB2를 더한 뒤 8비트로 만들어서 사용함
+dR2, dG2, dB2는 3비트이고, 2의 보수를 사용하여 -4에서 +3까지를 표현
+
+cw1과 cw2를 이용해서 각 subblock에서 사용할 table을 결정
+
+    table codeword                modifier table
+    ------------------        ----------------------
+            0                     -8  -2  2   8
+            1                    -17  -5  5  17
+            2                    -29  -9  9  29
+            3                    -42 -13 13  42
+            4                    -60 -18 18  60
+            5                    -80 -24 24  80
+            6                   -106 -33 33 106
+            7                   -183 -47 47 183
+
+bit 31 ~ 16의 MSB와 bit 15 ~ 0의 LSB를 이용해 base color에서 table의 어떤 값을 사용할지 결정
+
+    pixel index value
+    ---------------
+     msb     lsb           resulting modifier value
+    -----   -----          -------------------------
+      1       1            -b (large negative value)
+      1       0            -a (small negative value)
+      0       0             a (small positive value)
+      0       1             b (large positive value)

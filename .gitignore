@@ -1,6 +1,7 @@
 node_modules/
 yarn.lock
 
-*.obj
 *.unity3d
 *.unity3d.lz4
+*.obj
+*.png

@@ -6,6 +6,7 @@
   "author": "Snack <korsnack@korsnack.kr>",
   "license": "MIT",
   "dependencies": {
-    "UnityBundle.js": "Snack-X/UnityBundle.js"
+    "UnityBundle.js": "Snack-X/UnityBundle.js",
+    "jimp": "^0.2.27"
   }
 }
