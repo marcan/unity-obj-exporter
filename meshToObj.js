@@ -71,7 +71,6 @@ function getMeshData(mesh) {
     triangles.push(subTriangles);
   }
 
-  let channelCountV5 = 8;
   let buf = mesh.m_VertexData.m_DataSize, pos = 0;
   let channels = mesh.m_VertexData.m_Channels.Array;
   let streams = channels.map(c => c.stream);
@@ -88,23 +87,16 @@ function getMeshData(mesh) {
         }
 
         if(ch && 0 < ch.dimension && ch.stream === s) {
-          if(j === 0) { vertices.push(read3Float(buf, pos)); pos += 12; }
-          else if(j === 1) { normals.push(read3Float(buf, pos)); pos += 12; }
-          else if(j === 2) { colors.push(read4UInt8(buf, pos)); pos += 4; }
-          else if(j === 3) { uv1.push(read2Float(buf, pos)); pos += 8; }
-          else if(j === 4) { uv2.push(read2Float(buf, pos)); pos += 8; }
-          else if(j === 5) {
-            if(channelCount === channelCountV5) {
-              uv3.push(read2Float(buf, pos));
-              pos += 8;
-            }
-            else {
-              tangents.push(read4Float(buf, pos));
-              pos += 16;
-            }
+          switch(j) {
+            case 0: vertices.push(read3Float(buf, pos)); pos += 12; break;
+            case 1:  normals.push(read3Float(buf, pos)); pos += 12; break;
+            case 2:   colors.push(read4UInt8(buf, pos)); pos +=  4; break;
+            case 3:      uv1.push(read2Float(buf, pos)); pos +=  8; break;
+            case 4:      uv2.push(read2Float(buf, pos)); pos +=  8; break;
+            case 5:      uv3.push(read2Float(buf, pos)); pos +=  8; break;
+            case 6:      uv3.push(read2Float(buf, pos)); pos +=  8; break;
+            case 7: tangents.push(read4Float(buf, pos)); pos += 16; break;
           }
-          else if(j === 6) { uv3.push(read2Float(buf, pos)); pos += 8; }
-          else if(j === 7) { tangents.push(read4Float(buf, pos)); pos += 16; }
         }
       }
     }
