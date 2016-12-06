@@ -44,7 +44,7 @@ const TEX_FORMAT_ALPHA = [ A8, A4_R4_G4_B4, R8_G8_B8_A8, A8_R8_G8_B8, R4_G4_B4_A
 const TEX_FORMAT_NONALPHA = [ R8_G8_B8, R5_G6_B5, ETC1_RGB ];
 const TEX_FORMAT = [].concat(TEX_FORMAT_NONALPHA, TEX_FORMAT_NONALPHA);
 
-function textureToJimp(texture) {
+function textureToJimp(texture, flipHorizontal = false, flipVertical = true) {
   let width = texture.m_Width;
   let height = texture.m_Height;
   let format = texture.m_TextureFormat;
@@ -81,7 +81,7 @@ function textureToJimp(texture) {
       else x += 4;
     }
 
-    img.flip(false, true);
+    img.flip(flipHorizontal, flipVertical);
     return img;
   }
 
@@ -147,7 +147,7 @@ function textureToJimp(texture) {
     if(x >= width) { x = 0; y++; }
   }
 
-  img.flip(false, true);
+  img.flip(flipHorizontal, flipVertical);
   return img;
 }
 

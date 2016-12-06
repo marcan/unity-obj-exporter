@@ -31,7 +31,7 @@ for(let i = 0 ; i < unityBundle.length ; i++) {
     }
     else if(object._type === "Texture2D") {
       let filename = prefix + object.m_Name + ".png";
-      let img = UnityUtils.textureToJimp(object);
+      let img = UnityUtils.textureToJimp(object, false, false); // Don't flip
       img.write(filename);
     }
   }
