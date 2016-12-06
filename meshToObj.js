@@ -77,8 +77,25 @@ function getMeshData(mesh) {
   let streamCount = streams.filter((v, i, a) => a.indexOf(v) === i).length;
   let channelCount = channels.length;
 
+  let streamSize = new Array(streamCount).fill(0);
+
+  for(let ch of channels) {
+    if(ch.dimension <= 0) continue;
+
+    if(ch.format === 1) throw "16 bit floats are not supported";
+
+    switch(ch.format) {
+      case 0: streamSize[ch.stream] += ch.dimension * 4; break;
+      case 1: throw "16 bit floats are not supported";
+      case 2: streamSize[ch.stream] += ch.dimension * 1; break;
+      default: throw "unknown format";
+    }
+  }
+
+  let vertexCount = mesh.m_VertexData.m_VertexCount;
+
   for(let s = 0 ; s < streamCount ; s++) {
-    for(let i = 0 ; i < mesh.m_VertexData.m_VertexCount ; i++) {
+    for(let i = 0 ; i < vertexCount ; i++) {
       for(let j = 0 ; j < channelCount ; j++) {
         let ch;
         if(0 < channelCount) {
@@ -100,6 +117,13 @@ function getMeshData(mesh) {
         }
       }
     }
+
+    // Quote from reference
+    //   > sometimes there are 8 bytes between streams
+    //   > this is NOT an alignment, even if sometimes it may seem so
+    // Ref: RaduMC/UnityStudio/Unity Studio/Unity Classes/Mesh.cs#L666-L667
+    if(streamCount === 2 && s === 0)
+      pos = buf.length - streamSize[1] * vertexCount;
   }
 
   return {
