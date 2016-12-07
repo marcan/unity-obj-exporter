@@ -26,7 +26,7 @@ function clamp(i) {
 function unpackEtc1Block(upper, lower) {
   let flipbit = (upper     ) & 1;
   let diffbit = (upper >> 1) & 1;
-  let cw = [ (upper >> 2) & 7, (upper >> 5) & 7 ];
+  let cw = [ (upper >> 5) & 7, (upper >> 2) & 7 ];
   let baseColor = [];
 
   let r1, g1, b1, r2, g2, b2;
@@ -67,8 +67,9 @@ function unpackEtc1Block(upper, lower) {
     let subblock = SUBBLOCK[flipbit][i];
     let base = baseColor[subblock];
 
-    let lsb =  low & 1;  low >>= 1;
-    let msb = high & 1; high >>= 1;
+    let bit = (i >> 2) | ((i & 3) << 2);
+    let lsb = (low >> bit) & 1;
+    let msb = (high >> bit) & 1;
     let index = PIXEL_INDEX[msb * 2 + lsb];
     let diff = TABLE[cw[subblock]][index];
 
