@@ -1,6 +1,6 @@
 {
   "name": "unity-obj-exporter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Export .unity3d to .obj",
   "main": "index.js",
   "author": "Snack <korsnack@korsnack.kr>",

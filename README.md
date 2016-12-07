@@ -2,6 +2,8 @@
 
 Highly experimental .obj exporter in Node.js.
 
+It will also export textures and bones.
+
 Work in progress.
 
 ## Reference

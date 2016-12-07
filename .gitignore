@@ -5,3 +5,4 @@ yarn.lock
 *.unity3d.lz4
 *.obj
 *.png
+*_bone.json
